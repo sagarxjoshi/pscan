@@ -1,0 +1,3 @@
+/home/kapalin/dev/pscan/CMakeFiles/pscan.dir
+/home/kapalin/dev/pscan/CMakeFiles/edit_cache.dir
+/home/kapalin/dev/pscan/CMakeFiles/rebuild_cache.dir

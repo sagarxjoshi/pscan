@@ -1,0 +1,1 @@
+/usr/bin/c++  -Wall -Werror -std=c++14 -g -Wl,--dependency-file=CMakeFiles/pscan.dir/link.d CMakeFiles/pscan.dir/src/main.cpp.o -o pscan  -lnet -lpcap
