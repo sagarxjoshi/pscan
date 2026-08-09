@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<CodeLite_Workspace Name="pscan">
-	<Project Name="pscan" Path="pscan.project" Active="No"/>
-	<BuildMatrix>
-		<WorkspaceConfiguration Name="Debug" Selected="yes">
-			<Project Name="pscan" ConfigName="Debug"/>
-		</WorkspaceConfiguration>
-	</BuildMatrix>
-</CodeLite_Workspace>

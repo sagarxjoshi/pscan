@@ -1,7 +1,0 @@
-{
-	"InstallScripts" : 
-	[
-		"/home/kapalin/dev/pscan/cmake_install.cmake"
-	],
-	"Parallel" : false
-}

@@ -1,0 +1,16 @@
+# Core Build destination path
+build-Debug/
+
+# Direct root fallbacks if generated accidentally
+CMakeCache.txt
+CMakeFiles/
+Makefile
+cmake_install.cmake
+
+# Visual Studio Compiler specific outputs
+*.pdb
+*.ilk
+*.idb
+*.obj
+*.exe.recipe
+
