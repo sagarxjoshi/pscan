@@ -1,2 +1,18 @@
 # pscan
-pscan is a cross-platform port scanner
+
+*pscan uses TCP-SYN scans to scan for open TCP ports.*
+
+Instructions:
+
+- Clone repository
+
+`git clone https://github.com/sagarxjoshi/pscan.git`
+
+- Build
+
+`./build.sh`
+
+- Help menu
+
+` pscan <-h> or <--help>`
+
