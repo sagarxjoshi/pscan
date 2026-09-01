@@ -9,7 +9,7 @@
 #include "capture.h"
 #include "write_pckts.h"
 #include "proc_pckts.h"
-
+#include "cidr.h"
  
 int main(int argc, char *argv[]) {
 	
@@ -21,10 +21,12 @@ int main(int argc, char *argv[]) {
 	}
 	
 	std::string target;
-	std::string portRange;
+	std::string target_network;
+	std::string port_range;
 	std::string token;
 	std::vector <std::string> ports;
 	std::string outfile;
+	network net;
 	
 	/* defining program options */
 	for ( int i = 1; i < argc; i++ ){
@@ -36,11 +38,15 @@ int main(int argc, char *argv[]) {
 			/* assign next value as argument and increment index */
 			target = argv[++i];
 			
+		}else if ( (arg == "-tn" || arg == "--target-network") && i + 1 < argc ){
+			
+			target_network = argv[++i];
+			
 		}else if ( (arg == "-p" || arg == "--ports") && i + 1 < argc ) {
 			
 			/* stores the port range user defines */
-			portRange = argv[++i];
-			std::istringstream stream(portRange);
+			port_range = argv[++i];
+			std::istringstream stream(port_range);
 			
 			/* storing ports in a vector structure to use later*/
 			while (std::getline(stream, token, '-')) {
@@ -54,6 +60,7 @@ int main(int argc, char *argv[]) {
 		}else if ( (arg == "-h" || arg == "--help") ) {
 			
 			std::cout << " -t or --target <IP address> " << std::endl;
+			std::cout << " -tn or --target-network <CIDR - example: 192.168.1.0/24 > " << std::endl;
 			std::cout << " -p or --ports <start port-end port> " << std::endl;
 			std::cout << " -o or --out-file <ouput file name> " << std::endl;
 			std::cout << " -h or --help <help menu> " << std::endl;
@@ -75,6 +82,28 @@ int main(int argc, char *argv[]) {
 	std::string device;
 	
 	
+	std::cout << target_network << std::endl;
+	std::cout << outfile << std::endl;
+	
+	if (!(target_network.empty())){
+		
+		/* convert CIDR to IP addr structure */
+		net = cidr_toipaddr(target_network);
+		std::string net_ip = net.network_ip;
+		std::string broad_ip = net.broadcast_ip;
+		std::size_t net_ipint = get_ipint(net_ip);
+		std::size_t broad_ipint = get_ipint(broad_ip);
+		
+		for (std::size_t current = net_ipint+1; current <= broad_ipint-1; current++){
+			
+			std::string ipstr_iter = get_ipstr(current);
+			std::cout << ipstr_iter << std::endl;
+		}
+		
+	}else{
+		
+		std::cout << "network not supplied" << std::endl;
+	}
 	
 	/* set interface */
 	device = get_interface();
@@ -124,7 +153,7 @@ int main(int argc, char *argv[]) {
 	pcap_breakloop(handle);
 	receiver.join();
 	
-	if (argv[3]) {
+	if (argv[5]) {
 		
 		/* write output to file */
 		std::string open_file = outfile + "_open";
