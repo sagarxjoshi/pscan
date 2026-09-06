@@ -32,6 +32,7 @@ std::string get_ipstr(std::size_t ipaddr_int){
 
 }
 
+/* converts IP string to an unsigned integer */
 std::size_t get_ipint(const std::string& ipaddr_str){
 	
 	std::size_t oct1, oct2, oct3, oct4;

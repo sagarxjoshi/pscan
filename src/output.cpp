@@ -7,29 +7,29 @@
 
 
 /* writes open ports to console */
-void write_open_ports (std::vector<uint32_t> open_ports){
+void write_open_ports (std::vector<uint32_t>& open_ports, std::ostream& os){
 	
-	std::cout << "++++++++++++++++++++++++++++++++++++++++++++++++" << std::endl;
-	std::cout << "                  Open Ports					  " << std::endl;
-	std::cout << "++++++++++++++++++++++++++++++++++++++++++++++++" << std::endl;
+	os << "++++++++++++++++++++++++++++++++++++++++++++++++" << std::endl;
+	os << "                  Open Ports					  " << std::endl;
+	os << "++++++++++++++++++++++++++++++++++++++++++++++++" << std::endl;
 	
-	for (uint32_t port : open_ports) {
+	for (const auto& port : open_ports) {
 		
-		std::cout << "Port: " << port << std::endl;
+		os << "Port: " << port << std::endl;
 	}
 }
 
 
 /* writes closed ports to console */
-void write_closed_ports (std::vector<uint32_t> closed_ports){
+void write_closed_ports (std::vector<uint32_t>& closed_ports, std::ostream& os){
 	
-	std::cout << "++++++++++++++++++++++++++++++++++++++++++++++++" << std::endl;
-	std::cout << "                 Closed Ports					  " << std::endl;
-	std::cout << "++++++++++++++++++++++++++++++++++++++++++++++++" << std::endl;
+	os << "++++++++++++++++++++++++++++++++++++++++++++++++" << std::endl;
+	os << "                 Closed Ports					  " << std::endl;
+	os << "++++++++++++++++++++++++++++++++++++++++++++++++" << std::endl;
 	
-	for (uint32_t port : closed_ports) {
+	for (const auto& port : closed_ports) {
 		
-		std::cout << "Port: " << port << std::endl;
+		os << "Port: " << port << std::endl;
 	}
 }
 

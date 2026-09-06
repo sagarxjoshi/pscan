@@ -5,6 +5,7 @@
 #include <string>
 #include <thread>
 #include <sstream>
+#include <fstream>
 #include "output.h"
 #include "capture.h"
 #include "write_pckts.h"
@@ -82,29 +83,6 @@ int main(int argc, char *argv[]) {
 	std::string device;
 	
 	
-	std::cout << target_network << std::endl;
-	std::cout << outfile << std::endl;
-	
-	if (!(target_network.empty())){
-		
-		/* convert CIDR to IP addr structure */
-		net = cidr_toipaddr(target_network);
-		std::string net_ip = net.network_ip;
-		std::string broad_ip = net.broadcast_ip;
-		std::size_t net_ipint = get_ipint(net_ip);
-		std::size_t broad_ipint = get_ipint(broad_ip);
-		
-		for (std::size_t current = net_ipint+1; current <= broad_ipint-1; current++){
-			
-			std::string ipstr_iter = get_ipstr(current);
-			std::cout << ipstr_iter << std::endl;
-		}
-		
-	}else{
-		
-		std::cout << "network not supplied" << std::endl;
-	}
-	
 	/* set interface */
 	device = get_interface();
 	
@@ -127,49 +105,98 @@ int main(int argc, char *argv[]) {
 		return 1;
 	}
 	
-	dst_ip = libnet_name2addr4(l, target.c_str(), LIBNET_RESOLVE);
-	if (dst_ip < 0){
+	
+	
+	if (!(target_network.empty()) and !(outfile.empty())){
 		
-		std::cerr << "Bad destination IP address: " << libnet_geterror(l) << std::endl;
-		return 1;
-	}
-	
-
-	
-	ScanContext context;
-	
-	std::thread receiver(run_receiver, handle, &context);
-	/* scan loop */
-	for (uint32_t port = start_port; port <= end_port; port++){
+		/* convert CIDR to IP addr structure */
+		net = cidr_toipaddr(target_network);
+		std::string net_ip = net.network_ip;
+		std::string broad_ip = net.broadcast_ip;
+		std::size_t net_ipint = get_ipint(net_ip);
+		std::size_t broad_ipint = get_ipint(broad_ip);
 		
-		send_syn(l, src_port, port, src_ip, dst_ip);
+		for (std::size_t current = net_ipint+1; current <= broad_ipint-1; current++){
+			
+			std::string ipstr_iter = get_ipstr(current);
+			std::cout << ipstr_iter << std::endl;
+			dst_ip = libnet_name2addr4(l, ipstr_iter.c_str(), LIBNET_RESOLVE);
+			if (dst_ip < 0){
 		
-		std::this_thread::sleep_for(std::chrono::microseconds(400));
-	}
-	
-	std::this_thread::sleep_for(std::chrono::seconds(1));
-	
-	context.is_running = false;
-	pcap_breakloop(handle);
-	receiver.join();
-	
-	if (argv[5]) {
+				std::cerr << "Bad destination IP address: " << libnet_geterror(l) << std::endl;
+				return 1;
+			}
+			
+			ScanContext context;
+			std::thread receiver(run_receiver, handle, &context);
+			/* scan loop */
+			for (uint32_t port = start_port; port <= end_port; port++){
 		
-		/* write output to file */
-		std::string open_file = outfile + "_open";
-		std::string closed_file = outfile + "_closed";
+				send_syn(l, src_port, port, src_ip, dst_ip);
 		
-		open_port_file(context.open_ports, open_file);
-		closed_port_file(context.closed_ports, closed_file);
+				std::this_thread::sleep_for(std::chrono::microseconds(400));
+			}
+	
+			std::this_thread::sleep_for(std::chrono::seconds(1));
+	
+			context.is_running = false;
+			pcap_breakloop(handle);
+			receiver.join();
+			
+			/* write output to file */
+			std::ofstream out_stream(outfile + "_" + ipstr_iter);
+			
+			write_open_ports(context.open_ports, out_stream);
+			write_closed_ports(context.closed_ports, out_stream);
+	
+		}
+		
+	}else if ( !(target.empty()) and target_network.empty() ){
+		
+		dst_ip = libnet_name2addr4(l, target.c_str(), LIBNET_RESOLVE);
+		if (dst_ip < 0){
+			
+			std::cerr << "Bad destination IP address: " << libnet_geterror(l) << std::endl;
+			return 1;
+		}
+		
+		ScanContext context;
+		std::thread receiver(run_receiver, handle, &context);
+		/* scan loop */
+		for (uint32_t port = start_port; port <= end_port; port++){
+		
+			send_syn(l, src_port, port, src_ip, dst_ip);
+		
+			std::this_thread::sleep_for(std::chrono::microseconds(400));
+		}
+	
+		std::this_thread::sleep_for(std::chrono::seconds(1));
+	
+		context.is_running = false;
+		pcap_breakloop(handle);
+		receiver.join();
+		
+		if ( !(outfile.empty()) ) {
+		
+			/* write output to file */
+			std::ofstream out_stream(outfile + "_" + target);
+			
+			write_open_ports(context.open_ports, out_stream);
+			write_closed_ports(context.closed_ports, out_stream);
+		
+		}else{
+		
+			/* print resulting open and closed ports to console */
+			write_open_ports(context.open_ports, std::cout);
+			std::cout << std::endl;
+			write_closed_ports(context.closed_ports, std::cout);
+		}
 		
 	}else{
 		
-		/* print resulting open and closed ports to console */
-		write_open_ports(context.open_ports);
-		std::cout << std::endl;
-		write_closed_ports(context.closed_ports);
+		std::cout << "network not supplied" << std::endl;
 	}
-
+	
 	
 	pcap_close(handle);
 	libnet_destroy(l);
