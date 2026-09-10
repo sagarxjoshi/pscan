@@ -7,6 +7,7 @@
 
 void write_open_ports (std::vector<uint32_t>& open_ports, std::ostream& os);
 void write_closed_ports (std::vector<uint32_t>& closed_ports, std::ostream& os);
+void progress_bar(std::size_t host_number, std::size_t max_hosts);
 
 void open_port_file (std::vector<uint32_t> open_ports, std::string file);
 void closed_port_file (std::vector<uint32_t> closed_ports, std::string file);

@@ -1,18 +1,45 @@
 # pscan
 
-*pscan uses TCP-SYN scans to scan for open TCP ports.*
+*pscan is a libpcap\libnet based Port Scanner which uses TCP-SYN scans*
+*It is written in c++*
 
-Instructions:
+# Build 
 
-- Clone repository
+1. **Clone repository**
 
-`git clone https://github.com/sagarxjoshi/pscan.git`
+```bash
+git clone https://github.com/sagarxjoshi/pscan.git
+cd pscan
+```
 
-- Build
+2. **Configure the project**
 
-`./build.sh`
+```bash
+cmake -B build -S . -DCMAKE_BUILD_TYPE=Release
+```
 
-- Help menu
+3. **Compile the project**
 
-` pscan <-h> or <--help>`
+```bash
+cmake --build build --config Release
+```
 
+# Usage
+
+```bash
+pscan [OPTIONS]
+
+ -t or --target <IP address> 
+
+ -tn or --target-network <CIDR - example: 192.168.1.0/24>
+
+ -p or --ports <start port-end port> 
+
+ -o or --out-file <ouput file name> 
+
+ -h or --help <help menu> 
+```
+
+# Output
+
+~[Terminal Demo](./assets/output.gif)

@@ -6,7 +6,7 @@
 
 
 
-/* writes open ports to console */
+/* writes open ports to console/file */
 void write_open_ports (std::vector<uint32_t>& open_ports, std::ostream& os){
 	
 	os << "++++++++++++++++++++++++++++++++++++++++++++++++" << std::endl;
@@ -20,7 +20,7 @@ void write_open_ports (std::vector<uint32_t>& open_ports, std::ostream& os){
 }
 
 
-/* writes closed ports to console */
+/* writes closed ports to console/file */
 void write_closed_ports (std::vector<uint32_t>& closed_ports, std::ostream& os){
 	
 	os << "++++++++++++++++++++++++++++++++++++++++++++++++" << std::endl;
@@ -34,50 +34,8 @@ void write_closed_ports (std::vector<uint32_t>& closed_ports, std::ostream& os){
 }
 
 
-/* writes open ports to an output file */
-void open_port_file(std::vector<uint32_t> open_ports, std::string file){
+void progress_bar (std::size_t percentage, std::size_t max_hosts) {
 	
-	std::ofstream out_file(file);
-	
-	if (out_file.is_open()) {
-		
-		out_file << "++++++++++++++++++++++++++++++++++++++++++++++++" << std::endl;
-		out_file << "                  Open Ports					  " << std::endl;
-		out_file << "++++++++++++++++++++++++++++++++++++++++++++++++" << std::endl;
-		
-		for (auto port : open_ports){
-			
-			out_file << "Ports: " << port << std::endl;
-		}
-		
-		out_file.close();
-		
-	}else{
-		
-		std::cerr << "Error opening file: " << file << std::endl;
-	}
-}
-
-
-/* writes closed ports to an ouput file */
-void closed_port_file(std::vector<uint32_t> closed_ports, std::string file){
-	
-	std::ofstream out_file(file);
-	
-	if (out_file.is_open()) {
-		
-		out_file << "++++++++++++++++++++++++++++++++++++++++++++++++" << std::endl;
-		out_file << "                  Closed Ports					  " << std::endl;
-		out_file << "++++++++++++++++++++++++++++++++++++++++++++++++" << std::endl;
-		
-		for (auto port : closed_ports){
-			
-			out_file << "Ports: " << port << std::endl;
-		}
-		
-		out_file.close();
-	}else{
-		
-		std::cerr << "Error opening file: " << file << std::endl;
-	}
+	std::string progress = "[" + std::string(percentage, '*') + std::string(max_hosts - percentage, ' ') + "]";
+	std::cout << progress << "\r\033[F" << std::flush;
 }

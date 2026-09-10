@@ -60,10 +60,12 @@ int main(int argc, char *argv[]) {
 			
 		}else if ( (arg == "-h" || arg == "--help") ) {
 			
-			std::cout << " -t or --target <IP address> " << std::endl;
-			std::cout << " -tn or --target-network <CIDR - example: 192.168.1.0/24 > " << std::endl;
-			std::cout << " -p or --ports <start port-end port> " << std::endl;
-			std::cout << " -o or --out-file <ouput file name> " << std::endl;
+			std::cout << "pscan" << " [OPTIONS]" << std::endl << std::endl;
+			
+			std::cout << " -t or --target <IP address> " << std::endl << std::endl;
+			std::cout << " -tn or --target-network <CIDR - example: 192.168.1.0/24 " << std::endl << std::endl;
+			std::cout << " -p or --ports <start port-end port> " << std::endl << std::endl;
+			std::cout << " -o or --out-file <ouput file name> " << std::endl << std::endl;
 			std::cout << " -h or --help <help menu> " << std::endl;
 			return 0;
 
@@ -106,7 +108,7 @@ int main(int argc, char *argv[]) {
 	}
 	
 	
-	
+	/* when supplied CIDR, you must supply output file */
 	if (!(target_network.empty()) and !(outfile.empty())){
 		
 		/* convert CIDR to IP addr structure */
@@ -116,10 +118,15 @@ int main(int argc, char *argv[]) {
 		std::size_t net_ipint = get_ipint(net_ip);
 		std::size_t broad_ipint = get_ipint(broad_ip);
 		
+		/* set iterator for progress bar */
+		std::size_t cur_host = 1;
+		
 		for (std::size_t current = net_ipint+1; current <= broad_ipint-1; current++){
 			
+			
 			std::string ipstr_iter = get_ipstr(current);
-			std::cout << ipstr_iter << std::endl;
+			//std::cout << ipstr_iter << std::endl;
+			
 			dst_ip = libnet_name2addr4(l, ipstr_iter.c_str(), LIBNET_RESOLVE);
 			if (dst_ip < 0){
 		
@@ -137,20 +144,36 @@ int main(int argc, char *argv[]) {
 				std::this_thread::sleep_for(std::chrono::microseconds(400));
 			}
 	
-			std::this_thread::sleep_for(std::chrono::seconds(1));
+			std::this_thread::sleep_for(std::chrono::microseconds(700000));
 	
 			context.is_running = false;
 			pcap_breakloop(handle);
 			receiver.join();
 			
-			/* write output to file */
-			std::ofstream out_stream(outfile + "_" + ipstr_iter);
+			/* printing progress */
+			std::cout << "Processing: " << cur_host << " out of " << net.hosts << " hosts" << "\n" << std::flush;
+			progress_bar(cur_host, net.hosts);
+			usleep(10000);				
+			cur_host++;
+
 			
-			write_open_ports(context.open_ports, out_stream);
-			write_closed_ports(context.closed_ports, out_stream);
-	
+			/* write output to file only when a host has open ports */
+			if  ( !(context.open_ports.empty()) ){
+				
+				/* write output to file */
+				std::ofstream out_stream(outfile + "_" + ipstr_iter);
+				
+				write_open_ports(context.open_ports, out_stream);
+				write_closed_ports(context.closed_ports, out_stream);				
+			}
+			
+			/* clear container before we run the next host */
+			context.open_ports.clear();
 		}
 		
+		std::cout << std::endl;
+		std::cout << "Scan result written to " << outfile << std::endl;
+	
 	}else if ( !(target.empty()) and target_network.empty() ){
 		
 		dst_ip = libnet_name2addr4(l, target.c_str(), LIBNET_RESOLVE);
@@ -169,8 +192,9 @@ int main(int argc, char *argv[]) {
 		
 			std::this_thread::sleep_for(std::chrono::microseconds(400));
 		}
-	
-		std::this_thread::sleep_for(std::chrono::seconds(1));
+		
+		/* cool down for a seventh of a second */
+		std::this_thread::sleep_for(std::chrono::microseconds(700000));
 	
 		context.is_running = false;
 		pcap_breakloop(handle);
@@ -181,8 +205,12 @@ int main(int argc, char *argv[]) {
 			/* write output to file */
 			std::ofstream out_stream(outfile + "_" + target);
 			
-			write_open_ports(context.open_ports, out_stream);
-			write_closed_ports(context.closed_ports, out_stream);
+			/* write output to file only when a host has open ports */
+			if  ( !(context.open_ports.empty()) ){
+				
+				write_open_ports(context.open_ports, out_stream);
+				write_closed_ports(context.closed_ports, out_stream);				
+			}
 		
 		}else{
 		
@@ -194,7 +222,7 @@ int main(int argc, char *argv[]) {
 		
 	}else{
 		
-		std::cout << "network not supplied" << std::endl;
+		std::cout << "Invalid options used, refer to --help menu for more details." << std::endl;
 	}
 	
 	
