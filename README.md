@@ -43,4 +43,4 @@ pscan [OPTIONS]
 
 # Output
 
-![Terminal Demo](assets/output.gif)
+![Terminal Demo](https://github.com/user-attachments/assets/4855e41e-bfca-4838-9fb5-ae4dc42a940c)
