@@ -42,4 +42,4 @@ pscan [OPTIONS]
 
 # Output
 
-~[Terminal Demo](./assets/output.gif)
+![Terminal Demo](./assets/output.gif)

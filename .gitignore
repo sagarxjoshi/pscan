@@ -1,5 +1,6 @@
-# Core Build destination path
+# Core Build destination path and build file
 build-Debug/
+build.sh
 
 # Direct root fallbacks if generated accidentally
 CMakeCache.txt
