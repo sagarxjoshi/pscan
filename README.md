@@ -1,6 +1,7 @@
 # pscan
 
 *pscan is a libpcap\libnet based Port Scanner which uses TCP-SYN scans*
+<br>
 *It is written in c++*
 
 # Build 
@@ -42,4 +43,4 @@ pscan [OPTIONS]
 
 # Output
 
-![Terminal Demo](./assets/output.gif)
+![Terminal Demo](assets/output.gif)
