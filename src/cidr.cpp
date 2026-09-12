@@ -52,7 +52,7 @@ network cidr_toipaddr(std::string cidr_block){
 
 
 	std::size_t max_hosts;
-	std::size_t host_bits;
+	std::size_t host_bits = 0;
 	std::size_t mask_bits;
 	std::string ipaddr_str;
 	std::size_t ipaddr_int;

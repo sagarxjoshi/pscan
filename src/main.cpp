@@ -123,17 +123,15 @@ int main(int argc, char *argv[]) {
 		
 		for (std::size_t current = net_ipint+1; current <= broad_ipint-1; current++){
 			
-			
 			std::string ipstr_iter = get_ipstr(current);
-			//std::cout << ipstr_iter << std::endl;
 			
 			dst_ip = libnet_name2addr4(l, ipstr_iter.c_str(), LIBNET_RESOLVE);
 			if (dst_ip < 0){
 		
-				std::cerr << "Bad destination IP address: " << libnet_geterror(l) << std::endl;
+				std::cerr << "Bad destination IP address: " << libnet_geterror(l) <<  ipstr_iter << std::endl;
 				return 1;
 			}
-			
+
 			ScanContext context;
 			std::thread receiver(run_receiver, handle, &context);
 			/* scan loop */
@@ -144,19 +142,12 @@ int main(int argc, char *argv[]) {
 				std::this_thread::sleep_for(std::chrono::microseconds(400));
 			}
 	
-			std::this_thread::sleep_for(std::chrono::microseconds(700000));
+			std::this_thread::sleep_for(std::chrono::microseconds(1000000));
 	
 			context.is_running = false;
 			pcap_breakloop(handle);
 			receiver.join();
-			
-			/* printing progress */
-			std::cout << "Processing: " << cur_host << " out of " << net.hosts << " hosts" << "\n" << std::flush;
-			progress_bar(cur_host, net.hosts);
-			usleep(10000);				
-			cur_host++;
 
-			
 			/* write output to file only when a host has open ports */
 			if  ( !(context.open_ports.empty()) ){
 				
@@ -165,7 +156,16 @@ int main(int argc, char *argv[]) {
 				
 				write_open_ports(context.open_ports, out_stream);
 				write_closed_ports(context.closed_ports, out_stream);				
-			}
+			}	
+			
+			/* printing progress */
+			std::cout << "Processing: " << cur_host << " out of " << (net.hosts-2) << " hosts" << "\n" << std::flush;
+			progress_bar(cur_host, net.hosts-2);
+			usleep(10000);				
+			cur_host++;
+
+			
+
 			
 			/* clear container before we run the next host */
 			context.open_ports.clear();
@@ -179,7 +179,7 @@ int main(int argc, char *argv[]) {
 		dst_ip = libnet_name2addr4(l, target.c_str(), LIBNET_RESOLVE);
 		if (dst_ip < 0){
 			
-			std::cerr << "Bad destination IP address: " << libnet_geterror(l) << std::endl;
+			std::cerr << "Bad destination IP address: " << libnet_geterror(l) << target << std::endl;
 			return 1;
 		}
 		
@@ -193,8 +193,8 @@ int main(int argc, char *argv[]) {
 			std::this_thread::sleep_for(std::chrono::microseconds(400));
 		}
 		
-		/* cool down for a seventh of a second */
-		std::this_thread::sleep_for(std::chrono::microseconds(700000));
+		/* cool down for a second */
+		std::this_thread::sleep_for(std::chrono::microseconds(1000000));
 	
 		context.is_running = false;
 		pcap_breakloop(handle);
@@ -209,7 +209,10 @@ int main(int argc, char *argv[]) {
 			if  ( !(context.open_ports.empty()) ){
 				
 				write_open_ports(context.open_ports, out_stream);
-				write_closed_ports(context.closed_ports, out_stream);				
+				write_closed_ports(context.closed_ports, out_stream);			
+
+				std::cout << std::endl;
+				std::cout << "Scan result written to " << outfile << std::endl;
 			}
 		
 		}else{
