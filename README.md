@@ -43,4 +43,4 @@ pscan [OPTIONS]
 
 # Output
 
-![Terminal Demo](https://github.com/user-attachments/assets/4855e41e-bfca-4838-9fb5-ae4dc42a940c)
+![Terminal Demo](https://github.com/user-attachments/assets/f19ce7a2-d430-41d4-85e7-6aecc8651572)
